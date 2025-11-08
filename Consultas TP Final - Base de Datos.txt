@@ -1,0 +1,92 @@
+Consultas Simples:
+1. Contar la cantidad total de estudiantes
+SELECT COUNT(*) AS total_estudiantes
+FROM students_df;
+
+2. Calcular la edad promedio de los estudiantes
+SELECT ROUND(AVG(age),2) AS edad_promedio
+FROM students_df;
+
+Consultas de Complejas:
+3. Promedio de puntaje por género
+SELECT gender, ROUND(AVG(p.exam_score),2) AS promedio_puntaje
+FROM students_df s
+JOIN performance_df p ON s.student_id = p.student_id
+GROUP BY gender;
+
+4. Promedio de puntaje según el nivel educativo de los padres
+SELECT parental_education_level, ROUND(AVG(p.exam_score),2) AS promedio_puntaje
+FROM parents_df pa
+JOIN performance_df p ON pa.student_id = p.student_id
+GROUP BY parental_education_level;
+
+5. Promedio de puntaje según la calidad de la dieta
+SELECT diet_quality, ROUND(AVG(p.exam_score),2) AS promedio_puntaje
+FROM habits_df h
+JOIN performance_df p ON h.student_id = p.student_id
+GROUP BY diet_quality;
+
+6. Relación entre participación extracurricular y rendimiento
+SELECT extracurricular_participation, ROUND(AVG(p.exam_score),2) AS promedio_puntaje
+FROM habits_df h
+JOIN performance_df p ON h.student_id = p.student_id
+GROUP BY extracurricular_participation;
+
+7. Promedio de puntaje académico según nivel de salud mental
+SELECT mental_health_rating, ROUND(AVG(p.exam_score),2) AS promedio_puntaje
+FROM habits_df h
+JOIN performance_df p ON h.student_id = p.student_id
+GROUP BY mental_health_rating
+ORDER BY mental_health_rating DESC;
+
+8. Relación entre salud mental y horas de estudio
+SELECT ROUND(AVG(h.study_hours_per_day),2) AS promedio_horas_estudio,
+       ROUND(AVG(h.mental_health_rating),2) AS promedio_salud_mental
+FROM habits_df h;
+
+9. Promedio de salud mental según participación extracurricular
+SELECT extracurricular_participation,
+       ROUND(AVG(mental_health_rating),2) AS promedio_salud_mental
+FROM habits_df
+GROUP BY extracurricular_participation;
+
+10. Estudiantes con buena salud mental y alto rendimiento
+SELECT s.students_name, h.mental_health_rating, p.exam_score
+FROM students_df s
+JOIN habits_df h ON s.student_id = h.student_id
+JOIN performance_df p ON s.student_id = p.student_id
+WHERE h.mental_health_rating >= 8
+  AND p.exam_score > (
+	SELECT AVG(exam_score) FROM performance_df)
+	ORDER BY p.exam_score DESC;
+
+11. Estudiante con la nota más alta
+SELECT students_name, exam_score
+FROM students_df s
+JOIN performance_df p ON s.student_id = p.student_id
+WHERE exam_score = (
+	SELECT MAX(exam_score) FROM performance_df
+	);
+
+12. Estudiantes con puntaje inferior al promedio general
+SELECT students_name, exam_score
+FROM students_df s
+JOIN performance_df p ON s.student_id = p.student_id
+WHERE exam_score < (
+	SELECT AVG(exam_score) FROM performance_df
+	);
+
+13. Estudiantes con puntaje superior al promedio
+SELECT students_name, exam_score
+FROM students_df s
+JOIN performance_df p ON s.student_id = p.student_id
+WHERE exam_score > (
+	SELECT AVG(exam_score) FROM performance_df
+	);
+
+14. Número de estudiantes con rendimiento sobresaliente
+SELECT COUNT(*) AS estudiantes_sobresalientes
+FROM performance_df
+WHERE exam_score > (
+	SELECT AVG(exam_score) + 10 FROM performance_df
+	);
